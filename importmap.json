@@ -1,0 +1,6 @@
+{
+  "imports": {
+    "x-weather": "npm:x-weather"
+  }
+}
+

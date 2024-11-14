@@ -1,0 +1,17 @@
+{
+  "name": "socket-service-worker-weather-example",
+  "version": "0.0.1",
+  "description": "An example of a background worker and service worker to notify weather changes",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "ssc build -r",
+    "test": ":"
+  },
+  "author": "Joseph Werle <joseph@socketsupply.co>",
+  "license": "MIT",
+  "dependencies": {
+    "hono": "^4.6.10",
+    "x-weather": "^3.0.0"
+  }
+}
