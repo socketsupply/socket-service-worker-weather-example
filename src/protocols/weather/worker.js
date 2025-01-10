@@ -215,7 +215,7 @@ export class WeatherWorker extends EventTarget {
         }))
 
         this.#client.postMessage({
-          geolocation: { getCurrentPosition: true }
+          geolocation: { getCurrentRegion: true }
         })
 
         this.#region = await new Promise((resolve) => {

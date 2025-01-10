@@ -1,3 +1,7 @@
+import process from 'socket:process'
+
+const { IPGEOLOCATION_API_KEY } = process.env
+
 export const cache = new Set()
 
 export async function queryPermission () {
@@ -19,10 +23,10 @@ export async function getCurrentPosition () {
       })
     })
   } catch (err) {
-    if (/timeout/i.test(err.message)) {
+    if (/timeout|timed?\s+out/i.test(err.message)) {
       const ip = await getCurrentIPAddress()
       if (ip) {
-        const response = await fetch(`http://ip-api.com/json/${ip}`)
+        const response = await fetch(`https://api.ipgeolocation.io/ipgeo?apiKey=${IPGEOLOCATION_API_KEY}`)
         const json = await response.json()
         const now = Date.now()
         return Object.create(GeolocationPosition.prototype, {
@@ -30,8 +34,8 @@ export async function getCurrentPosition () {
           coords: {
             writable: false,
             value: Object.create(GeolocationCoordinates.prototype, {
-              latitude: { writable: false, value: json.lat },
-              longitude: { writable: false, value: json.lon },
+              latitude: { writable: false, value: parseFloat(json.latitude) },
+              longitude: { writable: false, value: parseFloat(json.longitude) },
               heading: { writable: false, value: null },
               floorLevel: { writable: false, value: null },
               speed: { writable: false, value: null },
@@ -42,8 +46,8 @@ export async function getCurrentPosition () {
                 writable: false,
                 enumerable: false,
                 value: () => ({
-                  latitude: json.lat,
-                  longitude: json.lon,
+                  latitude: parseFloat(json.latitude),
+                  longitude: parseFloat(json.longitude),
                   floorLevel: null,
                   heading: null,
                   speed: null,
@@ -61,8 +65,8 @@ export async function getCurrentPosition () {
             value: () => ({
               timestamp: now,
               coords: {
-                latitude: json.lat,
-                longitude: json.lon,
+                latitude: parseFloat(json.latitude),
+                longitude: parseFloat(json.longitude),
                 floorLevel: null,
                 heading: null,
                 speed: null,
@@ -80,16 +84,15 @@ export async function getCurrentPosition () {
 
 export async function getCurrentRegion () {
   try {
-    const ip = await getCurrentIPAddress()
-    const response = await fetch(`http://ip-api.com/json/${ip}`)
+    const response = await fetch(`https://api.ipgeolocation.io/ipgeo?apiKey=${IPGEOLOCATION_API_KEY}`)
     const json = await response.json()
     return {
-      country: json.country,
-      countryCode: json.countryCode,
-      region: json.region,
-      regionName: json.regionName,
+      country: json.country_name,
+      countryCode: json.country_code2,
+      region: json.district,
+      regionName: json.city,
       city: json.city,
-      timezone: json.timezone
+      timezone: json.time_zone.name
     }
   } catch (err) {
     // offline
